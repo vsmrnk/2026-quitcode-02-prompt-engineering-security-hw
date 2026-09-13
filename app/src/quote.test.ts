@@ -20,6 +20,12 @@ describe("estimateTotalCents", () => {
     expect(estimateTotalCents({ hours: 10, rateCents: 5000, discountPercent: 100 })).toBe(0);
   });
 
+  it("знижка 100% дає 0 навіть при величезному gross (не переповнюється)", () => {
+    // gross = MAX_VALUE * 1 — скінченний, але gross*100 → Infinity.
+    // Гарантія «знижка 100 → 0» має триматись, а не кидати помилку.
+    expect(estimateTotalCents({ hours: Number.MAX_VALUE, rateCents: 1, discountPercent: 100 })).toBe(0);
+  });
+
   it("округлює half-up до цента", () => {
     // 3 * 3333 = 9999; знижка 33% → 9999 * 0.67 = 6699.33 → 6699
     expect(estimateTotalCents({ hours: 3, rateCents: 3333, discountPercent: 33 })).toBe(6699);

@@ -59,6 +59,15 @@ export function estimateTotalCents(input: QuoteInput): number {
     );
   }
   const gross = hours * rateCents;
+  if (!Number.isFinite(gross)) {
+    throw new QuoteInputError(`проміжний добуток не скінченний (hours=${hours}, rateCents=${rateCents})`);
+  }
+  // Гарантія контракту: знижка 100% завжди дає 0. Без цього рядка при величезному
+  // (але скінченному) gross вираз gross*100 переповнюється до Infinity, і функція
+  // кидала б помилку замість повернути 0.
+  if (discountPercent === 100) {
+    return 0;
+  }
   const discount = (gross * discountPercent) / 100;
   const total = Math.round(gross - discount);
   if (!Number.isFinite(total)) {
