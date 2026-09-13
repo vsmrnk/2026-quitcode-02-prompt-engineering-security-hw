@@ -26,6 +26,17 @@ describe("estimateTotalCents", () => {
     expect(estimateTotalCents({ hours: Number.MAX_VALUE, rateCents: 1, discountPercent: 100 })).toBe(0);
   });
 
+  it("знижка <100% при величезному gross повертає скінченне, а не кидає", () => {
+    // gross*99 → Infinity; fallback має дати скінченний результат.
+    const r = estimateTotalCents({ hours: Number.MAX_VALUE, rateCents: 1, discountPercent: 99 });
+    expect(Number.isFinite(r)).toBe(true);
+  });
+
+  it("half-up зберігається на межі 50/55% (не ламається fallback-ом)", () => {
+    // gross=50, знижка 55% → 27.5, 50-27.5=22.5 → round half-up = 23
+    expect(estimateTotalCents({ hours: 50, rateCents: 1, discountPercent: 55 })).toBe(23);
+  });
+
   it("округлює half-up до цента", () => {
     // 3 * 3333 = 9999; знижка 33% → 9999 * 0.67 = 6699.33 → 6699
     expect(estimateTotalCents({ hours: 3, rateCents: 3333, discountPercent: 33 })).toBe(6699);

@@ -85,5 +85,5 @@ Senior TypeScript-розробник, що пише production-код з тес�
   Причина — `Math.round(total/parts)` для кожної частки окремо.
 - **Виправлено** методом найбільшого залишку (`Math.trunc` + розкид залишку),
   плюс валідація (`Number.isSafeInteger`, межа `parts`, `NaN` у знижці).
-- **До:** 4 тести. **Після:** 46 тестів, усі зелені; `typecheck` чистий.
-- **sha256 `quote.ts`:** `9e95cc0a…` → `60b59063…`. Повний лог — `docs/prompt-runs.md`.
+- **До:** 4 тести. **Після:** 49 тестів (37 → 46 meta-prompting → 49 після рев'ю CodeRabbit), усі зелені; `typecheck` чистий.
+- **sha256 `quote.ts`:** `9e95cc0a…` → `a8cd01a5…` (повні хеші — `docs/prompt-runs.md`).

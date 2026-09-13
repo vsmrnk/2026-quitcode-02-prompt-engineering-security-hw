@@ -62,13 +62,19 @@ export function estimateTotalCents(input: QuoteInput): number {
   if (!Number.isFinite(gross)) {
     throw new QuoteInputError(`проміжний добуток не скінченний (hours=${hours}, rateCents=${rateCents})`);
   }
-  // Гарантія контракту: знижка 100% завжди дає 0. Без цього рядка при величезному
-  // (але скінченному) gross вираз gross*100 переповнюється до Infinity, і функція
-  // кидала б помилку замість повернути 0.
+  // Гарантія контракту: знижка 100% завжди дає 0.
   if (discountPercent === 100) {
     return 0;
   }
-  const discount = (gross * discountPercent) / 100;
+  // Точна формула (зберігає half-up округлення на межах .5). Але для величезного
+  // (хай і скінченного) gross добуток gross*discountPercent переповнюється до
+  // Infinity — тоді переходимо на переповнення-безпечний варіант (ділимо перше).
+  // За межами safe-integer точність і так не гарантується (див. контракт), тож
+  // тут головне — повернути скінченний результат, а не кидати помилку.
+  let discount = (gross * discountPercent) / 100;
+  if (!Number.isFinite(discount)) {
+    discount = (gross / 100) * discountPercent;
+  }
   const total = Math.round(gross - discount);
   if (!Number.isFinite(total)) {
     throw new QuoteInputError(`результат розрахунку не скінченний (gross=${gross})`);
